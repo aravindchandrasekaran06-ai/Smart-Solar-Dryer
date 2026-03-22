@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html>
+<head >>
+    <meta charset="UTF-8">
+    <title>Smart Solar Dryer</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>>
+
+</head>
+<body>
+
+
+<h1>Smart Solar Dryer Dashboard</h1>
+<h2 id="temp">Temperature</h2>
+<h2 id="humidity">Humidity</h2>
+<h2 id="status">Status</h2>
+<canvas id="chart" width="400" height="200"></canvas>
+<script >
+    const labels =[];
+    const tempData =[];
+    const humidityData =[];
+    const ctx = document.getElementById('chart').getContext('2d');
+    const chart = new Chart(ctx, {
+
+    type: 'line',
+    data:{
+    labels: labels,
+    datasets:[
+    {
+
+    label: 'Temperature (°C)',
+    data: humidityData,
+    borderWidth:2
+
+    }
+
+    ]
+    }
+    });
+
+    async function fetchData(){
+    const res = await fetch ("http://localhost:8081/data");
+    const data = await res.json();
+
+    console.log(data);
+
+    document.getElementById("temp").innerText ="Temperature: " + data. temperature +"°C";
+    document.getElementById("humidity").innerText ="Humidity: " + data.humidity+" %";
+    document.getElementById("status").innerText ="Status: " + data.status;
+
+    const time = new Date().toLocaleTimeString();
+
+    labels.push(time);
+    tempData.push(data.temperature);
+    humidityData.push(data.humidity);
+
+    if (labels.length > 10){
+        labels.shift();
+        tempData.shift();
+        humidityData.shift();
+        }
+        chart.update();
+
+    }
+    fetchData();
+    setInterval(fetchData, 2000);
+</script>
+</body>
+</html>
